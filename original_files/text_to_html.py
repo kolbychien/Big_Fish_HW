@@ -1,6 +1,5 @@
 import html
 
-
 class TextFileToHtmlConverter:
 
     def __init__(self, file):

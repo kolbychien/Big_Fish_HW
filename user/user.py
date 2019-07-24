@@ -1,40 +1,41 @@
+from base_user import BaseUser
+from employee import Employee
+from vendor import Vendor
+from contractor import Contractor
+
+# My attempt using Factory Method Pattern, but problems all over:
+#   Add new network access type
+#   Add new user type
+
+
 class User:
     """ User information and behaviors."""
 
     def __init__(self, first_name=None, last_name=None, user_type=None):
-        self.first_name = first_name
-        self.last_name = last_name
-        self.user_type = user_type
-        self.employee_network_access = False
-        self.vendor_network_access = False
-        self.contractor_network_access = False
-        self.set_network_access()
+        self.user_obj = self.create_user(first_name, last_name, user_type)
+        self.first_name = self.user_obj.first_name
+        self.last_name = self.user_obj.last_name
+        self.user_type = self.user_obj.user_type
 
-    def set_network_access(self):
-        if self.user_type == "Employee":
-            self.employee_network_access = True
-            self.vendor_network_access = True
-            self.contractor_network_access = True
-        elif self.user_type == "Vendor":
-            self.employee_network_access = False
-            self.contractor_network_access = False
-            self.vendor_network_access = True
-        elif self.user_type == "Contractor":
-            self.contractor_network_access = True
-            self.vendor_network_access = False
-            self.employee_network_access = False
-        else:
-            self.revoke_all_network_access()
+    def create_user(self, first_name=None, last_name=None, user_type=None):
+        # Went with Factory Method, but addomg new types breaks Open/Closed
+        # I saw examples instantiating with globals() but doesn't seem like
+        # good practice
+        if user_type == 'Employee':
+            return Employee(first_name, last_name, user_type)
+        if user_type == 'Vendor':
+            return Vendor(first_name, last_name, user_type)
+        if user_type == 'Contractor':
+            return Contractor(first_name, last_name, user_type)
+        return BaseUser(first_name, last_name, user_type)
 
     def revoke_all_network_access(self):
-        self.employee_network_access = False
-        self.contractor_network_access = False
-        self.vendor_network_access = False
+        self.user_obj.revoke_all_network_access()
 
     def set_user_type(self, user_type):
+        self.user_obj = self.create_user(self.first_name, self.last_name, user_type)
         self.user_type = user_type
-        self.revoke_all_network_access()
-        self.set_network_access()
+        self.user_obj.set_network_access()
 
     def get_accessible_networks(self):
         networks = []
@@ -50,13 +51,14 @@ class User:
         return " ".join(networks)
 
     def get_full_name(self):
-        return " ".join([self.first_name, self.last_name])
+        return " ".join([self.user_obj.first_name, self.user_obj.last_name])
 
     def has_employee_network_access(self):
-        return self.employee_network_access
+        return self.user_obj.employee_network_access
 
     def has_vendor_network_access(self):
-        return self.vendor_network_access
+        return self.user_obj.vendor_network_access
 
     def has_contractor_network_access(self):
-        return self.contractor_network_access
+        return self.user_obj.contractor_network_access
+

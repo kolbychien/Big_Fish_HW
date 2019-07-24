@@ -76,6 +76,11 @@ class UserTest(unittest.TestCase):
         x = user.get_accessible_networks()
         self.assertEqual(x, "Aaron Wilson has access to these networks: Contractor")
 
+    def test_create_user_new_type(self):
+        user_obj = User()
+        new_obj = user_obj.create_user()
+
+        self.assertEqual('BaseUser', new_obj.__class__.__name__)
 
 if __name__ == "__main__":
     unittest.main()
